@@ -70,7 +70,6 @@ contract Token {
         address _to,
         uint256 _value
     ) public returns (bool success) {
-        // Check approval
         require(_value <= balanceOf[_from]);
         // the exchange (msg.sender) would call this function to transfer from deployer to receiver
         require(_value <= allowance[_from][msg.sender]);
