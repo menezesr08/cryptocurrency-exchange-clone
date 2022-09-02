@@ -6,21 +6,34 @@ import config from "../config.json";
 import { useDispatch } from "react-redux";
 import {
   loadAccounts,
+  loadExchange,
   loadNetwork,
   loadProvider,
-  loadToken,
+  loadTokens,
 } from "../store/interactions";
 
 function App() {
   const dispatch = useDispatch();
 
   const loadBlockchainData = async () => {
-    await loadAccounts(dispatch);
+ 
 
     const provider = loadProvider(dispatch);
+
     const chainId = await loadNetwork(provider, dispatch);
 
-    await loadToken(provider, config[chainId].DApp.address, dispatch);
+    const DApp = config[chainId].DApp
+    const mETH = config[chainId].mETH
+    const exchangeConfig = config[chainId].exchange;
+    // Fetch current account and balance from metamask
+    await loadAccounts(dispatch, provider);
+    await loadTokens(
+      provider,
+      [DApp.address, mETH.address],
+      dispatch
+    );
+
+    await loadExchange(provider, exchangeConfig.address, dispatch);
   };
 
   useEffect(() => {
