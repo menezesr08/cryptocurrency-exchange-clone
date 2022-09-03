@@ -5,33 +5,36 @@ import TOKEN_ABI from "../abis/Token.json";
 import config from "../config.json";
 import { useDispatch } from "react-redux";
 import {
-  loadAccounts,
+  loadAccount,
   loadExchange,
   loadNetwork,
   loadProvider,
   loadTokens,
 } from "../store/interactions";
+import Navbar from "./Navbar";
 
 function App() {
   const dispatch = useDispatch();
 
   const loadBlockchainData = async () => {
- 
-
     const provider = loadProvider(dispatch);
 
     const chainId = await loadNetwork(provider, dispatch);
 
-    const DApp = config[chainId].DApp
-    const mETH = config[chainId].mETH
+    const DApp = config[chainId].DApp;
+    const mETH = config[chainId].mETH;
     const exchangeConfig = config[chainId].exchange;
     // Fetch current account and balance from metamask
-    await loadAccounts(dispatch, provider);
-    await loadTokens(
-      provider,
-      [DApp.address, mETH.address],
-      dispatch
-    );
+
+    window.ethereum.on('chainChanged', () => {
+      window.location.reload()
+    })
+
+    window.ethereum.on('accountsChanged', () => {
+         loadAccount(dispatch, provider);
+    })
+  
+    await loadTokens(provider, [DApp.address, mETH.address], dispatch);
 
     await loadExchange(provider, exchangeConfig.address, dispatch);
   };
@@ -43,7 +46,7 @@ function App() {
   return (
     <div>
       {/* Navbar */}
-
+      <Navbar></Navbar>
       <main className="exchange grid">
         <section className="exchange__section--left grid">
           {/* Markets */}
