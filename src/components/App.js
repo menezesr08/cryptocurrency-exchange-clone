@@ -12,6 +12,7 @@ import {
   loadTokens,
 } from "../store/interactions";
 import Navbar from "./Navbar";
+import Markets from "./Markets";
 
 function App() {
   const dispatch = useDispatch();
@@ -26,14 +27,14 @@ function App() {
     const exchangeConfig = config[chainId].exchange;
     // Fetch current account and balance from metamask
 
-    window.ethereum.on('chainChanged', () => {
-      window.location.reload()
-    })
+    window.ethereum.on("chainChanged", () => {
+      window.location.reload();
+    });
 
-    window.ethereum.on('accountsChanged', () => {
-         loadAccount(dispatch, provider);
-    })
-  
+    window.ethereum.on("accountsChanged", () => {
+      loadAccount(dispatch, provider);
+    });
+
     await loadTokens(provider, [DApp.address, mETH.address], dispatch);
 
     await loadExchange(provider, exchangeConfig.address, dispatch);
@@ -50,7 +51,7 @@ function App() {
       <main className="exchange grid">
         <section className="exchange__section--left grid">
           {/* Markets */}
-
+          <Markets></Markets>
           {/* Balance */}
 
           {/* Order */}
