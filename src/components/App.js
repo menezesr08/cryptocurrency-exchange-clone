@@ -10,9 +10,11 @@ import {
   loadNetwork,
   loadProvider,
   loadTokens,
+  subscribeToEvents,
 } from "../store/interactions";
 import Navbar from "./Navbar";
 import Markets from "./Markets";
+import Balance from "./Balance";
 
 function App() {
   const dispatch = useDispatch();
@@ -37,7 +39,9 @@ function App() {
 
     await loadTokens(provider, [DApp.address, mETH.address], dispatch);
 
-    await loadExchange(provider, exchangeConfig.address, dispatch);
+    const exchange = await loadExchange(provider, exchangeConfig.address, dispatch);
+
+    subscribeToEvents(exchange, dispatch);
   };
 
   useEffect(() => {
@@ -53,6 +57,7 @@ function App() {
           {/* Markets */}
           <Markets></Markets>
           {/* Balance */}
+          <Balance></Balance>
 
           {/* Order */}
         </section>
