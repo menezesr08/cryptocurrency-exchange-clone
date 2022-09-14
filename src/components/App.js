@@ -8,6 +8,7 @@ import {
   loadAccount,
   loadExchange,
   loadNetwork,
+  loadOrders,
   loadProvider,
   loadTokens,
   subscribeToEvents,
@@ -16,6 +17,7 @@ import Navbar from "./Navbar";
 import Markets from "./Markets";
 import Balance from "./Balance";
 import Order from "./Order";
+import OrderBook from "./OrderBook";
 
 function App() {
   const dispatch = useDispatch();
@@ -41,7 +43,7 @@ function App() {
     await loadTokens(provider, [DApp.address, mETH.address], dispatch);
 
     const exchange = await loadExchange(provider, exchangeConfig.address, dispatch);
-
+    loadOrders(provider, exchange, dispatch);
     subscribeToEvents(exchange, dispatch);
   };
 
@@ -71,6 +73,7 @@ function App() {
           {/* Trades */}
 
           {/* OrderBook */}
+          <OrderBook></OrderBook>
         </section>
       </main>
 

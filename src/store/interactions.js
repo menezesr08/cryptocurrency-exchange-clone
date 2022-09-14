@@ -59,10 +59,22 @@ export const subscribeToEvents = (exchange, dispatch) => {
     dispatch({ type: "TRANSFER_SUCCESS", event });
   });
 
-  exchange.on("Order", (id, user, tokenGet, amountGet, tokenGive, amountGive, timestamp, event) => {
-    const order = event.args;
-    dispatch({ type: "NEW_ORDER_SUCCESS", order, event });
-  });
+  exchange.on(
+    "Order",
+    (
+      id,
+      user,
+      tokenGet,
+      amountGet,
+      tokenGive,
+      amountGive,
+      timestamp,
+      event
+    ) => {
+      const order = event.args;
+      dispatch({ type: "NEW_ORDER_SUCCESS", order, event });
+    }
+  );
 };
 
 // LOAD USER BALANCE (WALLET AND EXCHANGE)
@@ -84,6 +96,22 @@ export const loadBalances = async (exchange, tokens, account, dispatch) => {
   balance = await exchange.balanceOf(tokens[1].address, account);
   balance = ethers.utils.formatUnits(balance, 18);
   dispatch({ type: "EXCHANGE_TOKEN_2_LOADED_BALANCE", balance });
+};
+
+export const loadOrders = async (provider, exchange, dispatch) => {
+  const block = await provider.getBlockNumber();
+
+  const cancelStream = await exchange.queryFilter("Cancel", 0, block);
+  const cancelledOrders = cancelStream.map((event) => event.args);
+  dispatch({ type: "CANCELLED_ORDERS_LOADED", cancelledOrders });
+
+  const tradeStream = await exchange.queryFilter("Trade", 0, block);
+  const filledOrders = tradeStream.map((event) => event.args);
+  dispatch({ type: "FILLED_ORDERS_LOADED", filledOrders });
+  // From block 0 to the current block
+  const orderStream = await exchange.queryFilter("Order", 0, block);
+  const allOrders = orderStream.map((event) => event.args);
+  dispatch({ type: "ALL_ORDERS_LOADED", allOrders });
 };
 
 // TOKEN TRANSFERS
@@ -162,7 +190,6 @@ export const makeSellOrder = async (
   );
   const tokenGive = tokens[0].address;
   const amountGive = ethers.utils.parseUnits(order.amount, 18);
-  
 
   dispatch({ type: "NEW_ORDER_REQUEST" });
 
