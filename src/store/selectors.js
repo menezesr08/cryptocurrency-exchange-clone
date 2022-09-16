@@ -1,9 +1,11 @@
-import { get, groupBy, reject, maxBy, minBy, min } from "lodash";
+import { get, groupBy, reject, maxBy, minBy } from "lodash";
 import { createSelector } from "reselect";
 import { ethers } from "ethers";
 import moment from "moment";
 const tokens = (state) => get(state, "tokens.contracts");
 const account = (state) => get(state, "provider.account");
+const events = (state) => get(state, "exchange.events");
+
 const allOrders = (state) => get(state, "exchange.allOrders.data", []);
 const cancelledOrders = (state) =>
   get(state, "exchange.cancelledOrders.data", []);
@@ -11,6 +13,8 @@ const filledOrders = (state) => get(state, "exchange.filledOrders.data", []);
 
 const GREEN = "#25CE8F";
 const RED = "#F45353";
+
+
 
 const openOrders = (state) => {
   const all = allOrders(state);
@@ -29,6 +33,16 @@ const openOrders = (state) => {
 
   return openOrders;
 };
+
+export const myEventsSelector = createSelector(
+  account,
+  events,
+  (account, events) => {
+    events = events.filter((e) => e.args.user === account);
+    console.log(events);
+    return events;
+  }
+)
 
 export const myOpenOrdersSelector = createSelector(
   account,
@@ -52,7 +66,6 @@ export const myOpenOrdersSelector = createSelector(
     orders = decorateMyOpenOrders(orders, tokens);
 
     orders = orders.sort((a, b) => b.timestamp - a.timestamp);
- 
 
     return orders;
   }
@@ -107,10 +120,8 @@ export const myFilledOrdersSelector = createSelector(
       return;
     }
 
-   
+    orders = orders.filter((o) => o.user === account || o.creator === account);
 
-    orders = orders.filter((o) => o.user === account || o.creator === account)
-   
     orders = orders.filter(
       (o) =>
         o.tokenGet === tokens[0].address || o.tokenGet === tokens[1].address
@@ -121,42 +132,37 @@ export const myFilledOrdersSelector = createSelector(
     );
 
     orders = orders.sort((a, b) => b.timestamp - a.timestamp);
-  
-    orders = decorateMyFilledOrders(orders, account, tokens)
- 
+
+    orders = decorateMyFilledOrders(orders, account, tokens);
+
     return orders;
   }
 );
 
 const decorateMyFilledOrders = (orders, account, tokens) => {
-  return (
-    orders.map((order) => {
-      order = decorateOrder(order, tokens)
-      order = decorateMyFilledOrder(order, account, tokens)
-      return order;
-    })
-  )
-
-};
-
-const decorateMyFilledOrder = (order, account, tokens) => {
- const myOrder = order.creator === account;
- let orderType 
- if(myOrder) {
-  orderType = order.tokenGive === tokens[1].address ? 'buy' : 'sell'
- } else {
-  orderType = order.tokenGive === tokens[1].address ? 'sell' : 'buy'
- }
-
-  return ({
-    ...order,
-    orderType,
-    orderClass: (orderType === 'buy' ? GREEN : RED),
-    orderSign: (orderType === 'buy' ? '+' : '-'),
+  return orders.map((order) => {
+    order = decorateOrder(order, tokens);
+    order = decorateMyFilledOrder(order, account, tokens);
+    return order;
   });
 };
 
+const decorateMyFilledOrder = (order, account, tokens) => {
+  const myOrder = order.creator === account;
+  let orderType;
+  if (myOrder) {
+    orderType = order.tokenGive === tokens[1].address ? "buy" : "sell";
+  } else {
+    orderType = order.tokenGive === tokens[1].address ? "sell" : "buy";
+  }
 
+  return {
+    ...order,
+    orderType,
+    orderClass: orderType === "buy" ? GREEN : RED,
+    orderSign: orderType === "buy" ? "+" : "-",
+  };
+};
 
 export const filledOrdersSelector = createSelector(
   filledOrders,
