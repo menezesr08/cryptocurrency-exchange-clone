@@ -1,6 +1,6 @@
 require("@nomicfoundation/hardhat-toolbox");
 require("dotenv").config();
-const privateKeys = process.env.PRIVATE_KEYS || ''
+const privateKeys = process.env.PRIVATE_KEYS || "";
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -9,7 +9,11 @@ module.exports = {
     localhost: {},
     kovan: {
       url: `https://kovan.infura.io/v3/${process.env.INFURA_API_KEY}`,
-      accounts: privateKeys.split(','),
-    }
-  }
+      accounts: privateKeys.split(","),
+    },
+    mumbai: {
+      url: `https://polygon-mumbai.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
+      accounts: privateKeys.split(","),
+    },
+  },
 };
