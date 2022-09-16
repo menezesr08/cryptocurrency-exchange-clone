@@ -6,7 +6,7 @@ async function main() {
 
   const accounts = await ethers.getSigners();
   console.log(
-    `Accounts fetched: \n${accounts[0].address}\n${accounts[1].address}\n${accounts[2].address}`
+    `Accounts fetched: \n${accounts[0].address}\n${accounts[1].address}\n}`
   );
 
   const dapp = await Token.deploy("Dapp University", "DAPP", "1000000");
