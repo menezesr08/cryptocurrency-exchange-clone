@@ -75,6 +75,23 @@ export const subscribeToEvents = (exchange, dispatch) => {
       dispatch({ type: "NEW_ORDER_SUCCESS", order, event });
     }
   );
+
+  exchange.on(
+    "Cancel",
+    (
+      id,
+      user,
+      tokenGet,
+      amountGet,
+      tokenGive,
+      amountGive,
+      timestamp,
+      event
+    ) => {
+      const order = event.args;
+      dispatch({ type: "ORDER_CANCEL_SUCCESS", order, event });
+    }
+  );
 };
 
 // LOAD USER BALANCE (WALLET AND EXCHANGE)
@@ -201,5 +218,19 @@ export const makeSellOrder = async (
     await transaction.wait();
   } catch (e) {
     dispatch({ type: "NEW_ORDER_FAIL" });
+  }
+};
+
+// CANCEL ORDER
+export const cancelOrder = async (provider, exchange, order, dispatch) => {
+  dispatch({ type: "ORDER_CANCEL_REQUEST" });
+
+  try {
+    const signer = await provider.getSigner();
+    const transaction = await exchange.connect(signer).cancelOrder(order.id);
+    console.log('hit')
+    await transaction.wait();
+  } catch (e) {
+    dispatch({ type: "ORDER_CANCEL_FAIL" });
   }
 };
