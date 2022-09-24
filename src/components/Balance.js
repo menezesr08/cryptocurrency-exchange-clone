@@ -68,7 +68,7 @@ const Balance = () => {
       transferTokens(
         provider,
         exchange,
-        "Withdraw",
+        "Deposit",
         token,
         token2TransferAmount,
         dispatch
