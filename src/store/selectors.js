@@ -39,7 +39,6 @@ export const myEventsSelector = createSelector(
   events,
   (account, events) => {
     events = events.filter((e) => e.args.user === account);
-    console.log(events);
     return events;
   }
 )
@@ -181,6 +180,8 @@ export const filledOrdersSelector = createSelector(
         o.tokenGive === tokens[0].address || o.tokenGive === tokens[1].address
     );
 
+    orders = orders.sort((o) => o.user === account);
+
     orders = orders.sort((a, b) => a.timestamp - b.timestamp);
     orders = decorateFilledOrders(orders, tokens);
     orders = orders.sort((a, b) => b.timestamp - a.timestamp);
@@ -233,6 +234,8 @@ export const orderBookSelector = createSelector(
       (o) =>
         o.tokenGive === tokens[0].address || o.tokenGive === tokens[1].address
     );
+
+ 
     orders = decorateOrderbookOrders(orders, tokens);
     orders = groupBy(orders, "orderType");
 
@@ -247,7 +250,7 @@ export const orderBookSelector = createSelector(
       ...orders,
       sellOrders: sellOrders.sort((a, b) => b.tokenPrice - a.tokenPrice),
     };
-
+    console.log(orders);
     return orders;
   }
 );

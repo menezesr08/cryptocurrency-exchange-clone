@@ -79,7 +79,7 @@ const Transactions = () => {
                     return (
                       <tr key={index}>
                         <td style={{ color: `${order.orderTypeClass}` }}>
-                          {order.token0Amount}
+                          {order.token1Amount}
                         </td>
                         <td>{order.tokenPrice}</td>
                         <td>
@@ -135,7 +135,7 @@ const Transactions = () => {
                     <tr key={index}>
                     <td>{order.formattedTimestamp}</td>
                     <td style={{ color: `${order.orderClass}` }}>
-                          {order.orderSign}{order.token0Amount}</td>
+                          {order.orderSign}{order.token1Amount}</td>
                     <td>{order.tokenPrice}</td>
                   </tr>
                   )

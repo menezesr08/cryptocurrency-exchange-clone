@@ -193,7 +193,6 @@ export const makeBuyOrder = async (
   dispatch
 ) => {
   const tokenGet = tokens[0].address;
-  console.log(order);
   const amountGet = ethers.utils.parseUnits(order.amount, 18);
   const tokenGive = tokens[1].address;
   const amountGive = ethers.utils.parseUnits(
