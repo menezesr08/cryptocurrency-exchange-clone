@@ -45,11 +45,11 @@ const OrderBook = () => {
                 orderBook.sellOrders.map((order, index) => {
                   return (
                     <tr key={index} onClick={() => fillOrderHandler(order)}>
-                      <td>{order.token0Amount}</td>
+                      <td>{order.token1Amount}</td>
                       <td style={{ color: `${order.orderTypeClass}` }}>
                         {order.tokenPrice}
                       </td>
-                      <td>{order.token1Amount}</td>
+                      <td>{order.token0Amount}</td>
                     </tr>
                   );
                 })}

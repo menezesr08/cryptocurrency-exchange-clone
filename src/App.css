@@ -1,8 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
 
 :root {
-	--clr-primary: #0D121D;
-	--clr-secondary: #121A29;
+	--clr-primary: #1c2437;
+	--clr-secondary: #0f1a2f;
 	--clr-neutral: #767F92;
 
 	--clr-white: #F1F2F9;
@@ -199,12 +199,12 @@ small {
 	align-items: center;
 
 	background: #222D41;
-	border: none;
-	color: var(--clr-white);
 
+	color: var(--clr-white);
+	border-color: rgb(90, 12, 172);
 	margin: 0;
 	border-radius: 10px;
-
+	outline-style: solid;
 	width: 182px;
 	height: 48px;
 
