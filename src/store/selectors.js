@@ -4,7 +4,8 @@ import { ethers } from "ethers";
 import moment from "moment";
 const tokens = (state) => get(state, "tokens.contracts");
 const account = (state) => get(state, "provider.account");
-const events = (state) => get(state, "exchange.events");
+const exchangeEvents = (state) => get(state, "exchange.events");
+const tokensEvents = (state) => get(state, "tokens.events");
 
 const allOrders = (state) => get(state, "exchange.allOrders.data", []);
 const cancelledOrders = (state) =>
@@ -13,8 +14,6 @@ const filledOrders = (state) => get(state, "exchange.filledOrders.data", []);
 
 const GREEN = "#25CE8F";
 const RED = "#F45353";
-
-
 
 const openOrders = (state) => {
   const all = allOrders(state);
@@ -34,14 +33,24 @@ const openOrders = (state) => {
   return openOrders;
 };
 
-export const myEventsSelector = createSelector(
+export const myExchangeEventsSelector = createSelector(
   account,
-  events,
+  exchangeEvents,
   (account, events) => {
     events = events.filter((e) => e.args.user === account);
+
     return events;
   }
-)
+);
+
+export const myTokensEventsSelector = createSelector(
+  account,
+  tokensEvents,
+  (account, events) => {
+    events = events.filter((e) => e.args.to === account);
+    return events;
+  }
+);
 
 export const myOpenOrdersSelector = createSelector(
   account,
@@ -235,7 +244,6 @@ export const orderBookSelector = createSelector(
         o.tokenGive === tokens[0].address || o.tokenGive === tokens[1].address
     );
 
- 
     orders = decorateOrderbookOrders(orders, tokens);
     orders = groupBy(orders, "orderType");
 
@@ -250,7 +258,7 @@ export const orderBookSelector = createSelector(
       ...orders,
       sellOrders: sellOrders.sort((a, b) => b.tokenPrice - a.tokenPrice),
     };
-    console.log(orders);
+
     return orders;
   }
 );

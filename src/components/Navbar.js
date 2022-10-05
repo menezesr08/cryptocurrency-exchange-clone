@@ -1,7 +1,7 @@
 import logo from "../assets/logo.png";
 import { useSelector } from "react-redux";
 import Blockies from "react-blockies";
-import { loadAccount } from "../store/interactions";
+import { getFreeTokens, loadAccount } from "../store/interactions";
 import { useDispatch } from "react-redux";
 import eth from "../assets/eth.svg";
 import config from "../config.json";
@@ -11,10 +11,15 @@ const Navbar = () => {
   const account = useSelector((state) => state.provider.account);
   const balance = useSelector((state) => state.provider.balance);
   const chainId = useSelector((state) => state.provider.chainId);
+  const tokens = useSelector((state) => state.tokens.contracts);
+  const exchange = useSelector((state) => state.exchange.contract);
   const dispatch = useDispatch();
   const connectHandler = async () => {
     await loadAccount(dispatch, provider);
   };
+  const getTokensHandler = async (selectedToken) => {
+    await getFreeTokens( provider, selectedToken, account, dispatch);
+  }
   const networkHandler = async (e) => {
     await window.ethereum.request({
       method: "wallet_switchEthereumChain",
@@ -47,7 +52,10 @@ const Navbar = () => {
           </select>
         )}
       </div>
-
+      <div className="exchange__tokens flex">
+        <button className="button" onClick={() => getTokensHandler(tokens[0])}>Get DApp</button>
+        <button className="button" onClick={ () => getTokensHandler(tokens[1])}>Get mETH</button>
+      </div>
       <div className="exchange__header--account flex">
         {balance ? (
           <p>
@@ -61,13 +69,15 @@ const Navbar = () => {
 
         {account ? (
           <a
+
             href={
+              
               config[chainId]
                 ? `${config[chainId].explorerURL}/address/${account}`
                 : `#`
             }
             target="_blank"
-            rel="norefferer"
+            rel="noreferrer"
           >
             {account.slice(0, 5) + "..." + account.slice(38, 42)}
             <Blockies
