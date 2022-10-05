@@ -28,8 +28,17 @@ export const provider = (state = {}, action) => {
   }
 };
 
-const DEFAULT_TOKENS_STATE = { loaded: false, contracts: [], symbols: [] };
+const DEFAULT_TOKENS_STATE = {
+  loaded: false,
+  contracts: [],
+  symbols: [],
+  balances: [],
+  events: [],
+  transferIsPending: false,
+  isError: false,
+};
 export const tokens = (state = DEFAULT_TOKENS_STATE, action) => {
+  let currentBalance, newBalance, convertedNewBalance;
   switch (action.type) {
     case "TOKEN_1_LOADED":
       return {
@@ -43,6 +52,19 @@ export const tokens = (state = DEFAULT_TOKENS_STATE, action) => {
         ...state,
         balances: [action.balance],
       };
+    case "TOKEN_1_UPDATE_BALANCE":
+      if (state.balances.length > 0) {
+        currentBalance = ethers.utils.parseUnits(state.balances[0], 18);
+        newBalance = currentBalance.add(action.value);
+        convertedNewBalance = ethers.utils.formatUnits(newBalance, 18);
+      }
+
+      return {
+        ...state,
+        balances: [convertedNewBalance, state.balances[1]],
+        isPending: false,
+        events: [action.event, ...state.events],
+      };
     case "TOKEN_2_LOADED":
       return {
         ...state,
@@ -54,7 +76,39 @@ export const tokens = (state = DEFAULT_TOKENS_STATE, action) => {
       return {
         ...state,
         balances: [...state.balances, action.balance],
+
       };
+    case "TOKEN_2_UPDATE_BALANCE":
+      if (state.balances.length > 0) {
+        currentBalance = ethers.utils.parseUnits(state.balances[1], 18);
+        newBalance = currentBalance.add(action.value);
+        convertedNewBalance = ethers.utils.formatUnits(newBalance, 18);
+      }
+
+      return {
+        ...state,
+        balances: [state.balances[0], convertedNewBalance],
+        isPending: false,
+        events: [action.event, ...state.events],
+      };
+    case "TOKEN_TRANSFER_REQUEST":
+      return {
+        ...state,
+        isPending: true,
+        isError: false
+      };
+    case "TOKEN_TRANSFER_FAIL":
+      return {
+        ...state,
+        isPending: false,
+        isError: true,
+      };
+
+    case "CLEAR_TOKEN_EVENTS":
+      return {
+        ...state,
+        events: [],
+      }
     default:
       return state;
   }
@@ -275,6 +329,11 @@ export const exchange = (state = DEFAULT_EXCHANGE_STATE, action) => {
         },
         events: [action.event, ...state.events],
       };
+      case "CLEAR_EXCHANGE_EVENTS":
+        return {
+          ...state,
+          events: []
+        }
     default:
       return state;
   }

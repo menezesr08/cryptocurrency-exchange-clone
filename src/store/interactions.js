@@ -30,17 +30,21 @@ export const loadAccount = async (dispatch, provider) => {
 };
 
 export const loadTokens = async (provider, addresses, dispatch) => {
-  let token, symbol;
+  let symbol, token;
+  let tokens = [];
 
   token = new ethers.Contract(addresses[0], TOKEN_ABI, provider);
   symbol = await token.symbol();
+  tokens.push(token);
+
   dispatch({ type: "TOKEN_1_LOADED", token, symbol });
 
   token = new ethers.Contract(addresses[1], TOKEN_ABI, provider);
   symbol = await token.symbol();
   dispatch({ type: "TOKEN_2_LOADED", token, symbol });
+  tokens.push(token);
 
-  return token;
+  return tokens;
 };
 
 export const loadExchange = async (provider, address, dispatch) => {
@@ -49,7 +53,15 @@ export const loadExchange = async (provider, address, dispatch) => {
   return exchange;
 };
 
-export const subscribeToEvents = (exchange, dispatch) => {
+export const subscribeToEvents = async (exchange, tokens, dispatch) => {
+  tokens[0].on("Transfer", (from, to, value, event) => {
+    dispatch({ type: "TOKEN_1_UPDATE_BALANCE", value, event });
+  });
+
+  tokens[1].on("Transfer", (from, to, value, event) => {
+    dispatch({ type: "TOKEN_2_UPDATE_BALANCE", value, event });
+  });
+
   exchange.on("Deposit", (token, user, amount, balance, event) => {
     dispatch({ type: "TRANSFER_SUCCESS", event });
   });
@@ -109,21 +121,43 @@ export const subscribeToEvents = (exchange, dispatch) => {
       dispatch({ type: "ORDER_FILL_SUCCESS", order, event });
     }
   );
+};
+
+export const convertToken = (n) => {
+  return ethers.utils.parseUnits(n.toString(), "ether");
+};
 
 
-  
+export const getFreeTokens = async (
+  provider,
+  selectedToken,
+  account,
+  dispatch
+) => {
+  let transaction;
+  let balance = await selectedToken.balanceOf(account);
+  const signer = await provider.getSigner();
+  balance = ethers.utils.formatUnits(balance, 18);
+  if (balance < 500) {
+    dispatch({ type: "TOKEN_TRANSFER_REQUEST" });
+    transaction = await selectedToken.connect(signer).getFreeTokens();
+    await transaction.wait();
+  } else {
+    dispatch({ type: "TOKEN_TRANSFER_FAIL" });
+  }
 };
 
 // LOAD USER BALANCE (WALLET AND EXCHANGE)
 export const loadBalances = async (exchange, tokens, account, dispatch) => {
   let balance = await tokens[0].balanceOf(account);
   balance = ethers.utils.formatUnits(balance, 18);
+
   dispatch({ type: "TOKEN_1_LOADED_BALANCE", balance });
 
   balance = await exchange.balanceOf(tokens[0].address, account);
 
   balance = ethers.utils.formatUnits(balance, 18);
-  
+
   dispatch({ type: "EXCHANGE_TOKEN_1_LOADED_BALANCE", balance });
 
   balance = await tokens[1].balanceOf(account);
@@ -265,4 +299,7 @@ export const fillOrder = async (provider, exchange, order, dispatch) => {
   }
 };
 
-
+export const clearAlerts = async (dispatch) => {
+  dispatch({type: 'CLEAR_TOKEN_EVENTS'});
+  dispatch({type: 'CLEAR_EXCHANGE_EVENTS'});
+}
