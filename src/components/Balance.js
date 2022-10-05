@@ -103,8 +103,12 @@ const Balance = () => {
   };
 
   return (
+    
     <div className="component exchange__transfers">
+       
       <div className="component__header flex-between">
+        
+
         <h2>Balance</h2>
         <div className="tabs">
           <button
