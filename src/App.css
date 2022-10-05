@@ -171,6 +171,13 @@ small {
 	transform: translate(0, -50%);
 }
 
+.exchange__tokens {
+	grid-column-start: 7;
+	grid-column-end: 9;
+	position: absolute;
+}
+
+
 .exchange__header--account {
 	background: var(--clr-secondary);
 
