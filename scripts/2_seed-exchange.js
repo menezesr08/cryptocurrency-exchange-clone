@@ -15,7 +15,6 @@ async function main() {
 
   // Fetch network
   const { chainId } = await ethers.provider.getNetwork()
-  console.log("Using chainId:", chainId)
 
   const Dapp = await ethers.getContractAt(
     "Token",
@@ -52,6 +51,11 @@ async function main() {
     `Transferred ${amount} tokens from ${sender.address} to ${receiver.address}\n`
   );
 
+  transaction = await Dapp.connect(receiver).getFreeTokens();
+  console.log(
+    `Transferred ${amount} tokens from ${sender.address} to ${receiver.address}\n`
+  );
+
   // Set up exchange users
   const user1 = accounts[0];
   const user2 = accounts[1];
@@ -79,72 +83,72 @@ async function main() {
   await transaction.wait()
   console.log(`Deposited ${amount} tokens from ${user2.address}\n`)
 
-  //  // User 1 makes order to get tokens
-  //  let orderId
-  //  transaction = await exchange.connect(user1).makeOrder(mETH.address, tokens(100), Dapp.address, tokens(5))
-  //  result = await transaction.wait()
-  //  console.log(`Made order from ${user1.address}`)
+   // User 1 makes order to get tokens
+   let orderId
+   transaction = await exchange.connect(user1).makeOrder(mETH.address, tokens(100), Dapp.address, tokens(5))
+   result = await transaction.wait()
+   console.log(`Made order from ${user1.address}`)
 
-  //  // User 1 cancels order
-  // orderId = result.events[0].args.id
-  // transaction = await exchange.connect(user1).cancelOrder(orderId)
-  // result = await transaction.wait()
-  // console.log(`Cancelled order from ${user1.address}\n`)
+   // User 1 cancels order
+  orderId = result.events[0].args.id
+  transaction = await exchange.connect(user1).cancelOrder(orderId)
+  result = await transaction.wait()
+  console.log(`Cancelled order from ${user1.address}\n`)
 
-  // // Wait 1 second
-  // await wait(1)
+  // Wait 1 second
+  await wait(1)
 
-  //  /////////////////////////////////////////////////////////////
-  // // Seed Filled Orders
-  // //
-
-  // // User 1 makes order
-  // transaction = await exchange.connect(user1).makeOrder(mETH.address, tokens(100), Dapp.address, tokens(10))
-  // result = await transaction.wait()
-  // console.log(`Made order from ${user1.address}`)
-
-  // // User 2 fills order
-  // orderId = result.events[0].args.id
-  // transaction = await exchange.connect(user2).fillOrder(orderId)
-  // result = await transaction.wait()
-  // console.log(`Filled order from ${user1.address}\n`)
-
-  // // Wait 1 second
-  // await wait(1)
-
-  // // User 1 makes another order
-  // transaction = await exchange.makeOrder(mETH.address, tokens(50), Dapp.address, tokens(15))
-  // result = await transaction.wait()
-  // console.log(`Made order from ${user1.address}`)
-
-  // // User 2 fills another order
-  // orderId = result.events[0].args.id
-  // transaction = await exchange.connect(user2).fillOrder(orderId)
-  // result = await transaction.wait()
-  // console.log(`Filled order from ${user1.address}\n`)
-
-  // // Wait 1 second
-  // await wait(1)
-
-  // // User 1 makes final order
-  // transaction = await exchange.connect(user1).makeOrder(mETH.address, tokens(200), Dapp.address, tokens(20))
-  // result = await transaction.wait()
-  // console.log(`Made order from ${user1.address}`)
-
-  // // User 2 fills final order
-  // orderId = result.events[0].args.id
-  // transaction = await exchange.connect(user2).fillOrder(orderId)
-  // result = await transaction.wait()
-  // console.log(`Filled order from ${user1.address}\n`)
-
-  // // Wait 1 second
-  // await wait(1)
-
-  /////////////////////////////////////////////////////////////
-  // Seed Open Orders
+   /////////////////////////////////////////////////////////////
+  // Seed Filled Orders
   //
 
-  // User 1 makes 10 orders
+  // User 1 makes order
+  transaction = await exchange.connect(user1).makeOrder(mETH.address, tokens(100), Dapp.address, tokens(10))
+  result = await transaction.wait()
+  console.log(`Made order from ${user1.address}`)
+
+  // User 2 fills order
+  orderId = result.events[0].args.id
+  transaction = await exchange.connect(user2).fillOrder(orderId)
+  result = await transaction.wait()
+  console.log(`Filled order from ${user1.address}\n`)
+
+  // Wait 1 second
+  await wait(1)
+
+  // User 1 makes another order
+  transaction = await exchange.makeOrder(mETH.address, tokens(50), Dapp.address, tokens(15))
+  result = await transaction.wait()
+  console.log(`Made order from ${user1.address}`)
+
+  // User 2 fills another order
+  orderId = result.events[0].args.id
+  transaction = await exchange.connect(user2).fillOrder(orderId)
+  result = await transaction.wait()
+  console.log(`Filled order from ${user1.address}\n`)
+
+  // Wait 1 second
+  await wait(1)
+
+  // User 1 makes final order
+  transaction = await exchange.connect(user1).makeOrder(mETH.address, tokens(200), Dapp.address, tokens(20))
+  result = await transaction.wait()
+  console.log(`Made order from ${user1.address}`)
+
+  // User 2 fills final order
+  orderId = result.events[0].args.id
+  transaction = await exchange.connect(user2).fillOrder(orderId)
+  result = await transaction.wait()
+  console.log(`Filled order from ${user1.address}\n`)
+
+  // Wait 1 second
+  await wait(1)
+
+  ///////////////////////////////////////////////////////////
+  //Seed Open Orders
+  
+
+  //User 1 makes 10 orders
   for(let i = 1; i <= 5; i++) {
     transaction = await exchange.connect(user1).makeOrder(mETH.address, tokens(10 * i), Dapp.address, tokens(10))
     result = await transaction.wait()
@@ -155,16 +159,16 @@ async function main() {
     await wait(1)
   }
 
-  // // User 2 makes 10 orders
-  // for (let i = 1; i <= 10; i++) {
-  //   transaction = await exchange.connect(user2).makeOrder(Dapp.address, tokens(10), mETH.address, tokens(10 * i))
-  //   result = await transaction.wait()
+  // User 2 makes 10 orders
+  for (let i = 1; i <= 10; i++) {
+    transaction = await exchange.connect(user2).makeOrder(Dapp.address, tokens(10), mETH.address, tokens(10 * i))
+    result = await transaction.wait()
 
-  //   console.log(`Made order from ${user2.address}`)
+    console.log(`Made order from ${user2.address}`)
 
-  //   // Wait 1 second
-  //   await wait(1)
-  // }
+    // Wait 1 second
+    await wait(1)
+  }
 }
 
 main()
