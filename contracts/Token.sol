@@ -6,9 +6,11 @@ import "hardhat/console.sol";
 contract Token {
     string public name;
     string public symbol;
+    address public owner;
     uint256 public decimals = 18;
     // Multiply by 10^18 to get the total Supply in wei, not eth
     uint256 public totalSupply;
+    uint256 freeTokenAmount = (500 * (10**decimals));
 
     mapping(address => uint256) public balanceOf;
     mapping(address => mapping(address => uint256)) public allowance;
@@ -30,6 +32,13 @@ contract Token {
         symbol = _symbol;
         totalSupply = _totalSupply * (10**decimals);
         balanceOf[msg.sender] = totalSupply;
+        owner = msg.sender;
+    }
+
+    function getFreeTokens() public returns(bool success) {
+        require(balanceOf[msg.sender] < freeTokenAmount);
+        _transfer(owner, msg.sender, freeTokenAmount);
+        return true;
     }
 
     function transfer(address _to, uint256 _value)
