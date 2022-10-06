@@ -3,6 +3,7 @@
 Cryptocurrency Exchange
 
 A simple decentralized cryptocurrency exchange. Users can create orders, fill orders, cancel orders, view order history and see visual data representation. 
+
 https://curly-truth-7907.on.fleek.co/
 
 ## Project Status
