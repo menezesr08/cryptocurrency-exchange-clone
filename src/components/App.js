@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 
 import config from "../config.json";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
   loadAccount,
   loadExchange,
@@ -38,9 +38,8 @@ function App() {
       window.location.reload();
     });
     // this only loads after user has connected to wallet
-    let account;
     window.ethereum.on("accountsChanged", () => {
-      account = loadAccount(dispatch, provider);
+      loadAccount(dispatch, provider);
     });
 
     const tokens = await loadTokens(provider, [DApp.address, mETH.address], dispatch);

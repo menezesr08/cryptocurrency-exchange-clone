@@ -12,7 +12,6 @@ const Navbar = () => {
   const balance = useSelector((state) => state.provider.balance);
   const chainId = useSelector((state) => state.provider.chainId);
   const tokens = useSelector((state) => state.tokens.contracts);
-  const exchange = useSelector((state) => state.exchange.contract);
   const dispatch = useDispatch();
   const connectHandler = async () => {
     await loadAccount(dispatch, provider);
