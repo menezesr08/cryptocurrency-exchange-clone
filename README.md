@@ -9,6 +9,9 @@ https://curly-truth-7907.on.fleek.co/
 ## Project Status
 Core functionality complete. Future plans are to fix some UI bugs and add better features to enhance user experience.
 
+## Video Walkthrough
+https://streamable.com/bwvylv
+
 ## Installation and Setup Instructions
 
 #### Example:  
